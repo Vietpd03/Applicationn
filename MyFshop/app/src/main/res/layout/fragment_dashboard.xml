@@ -25,7 +25,6 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal">
 
-            <!-- SearchView for searching -->
             <androidx.appcompat.widget.SearchView
                 android:id="@+id/search_view"
                 android:layout_width="0dp"
@@ -33,36 +32,17 @@
                 android:layout_weight="1"
                 android:hint="Search"
                 android:queryHint="Search here" />
-
-            <!-- Button for triggering search -->
-            <com.example.myfshop.utils.MSPButton
-                android:id="@+id/btn_search"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_marginStart="16dp"
-                android:layout_marginEnd="16dp"
-                android:background="@drawable/button_background"
-                android:foreground="?attr/selectableItemBackground"
-                android:gravity="center"
-                android:paddingTop="@dimen/btn_padding"
-                android:paddingBottom="@dimen/btn_padding"
-                android:text="Search"
-                android:textColor="@android:color/white"
-                android:textSize="@dimen/btn_textSize" />
-
         </LinearLayout>
 
-        <!-- LinearLayout for the two buttons -->
+        <!-- LinearLayout for category buttons -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:layout_marginTop="8dp">
 
-            <!-- Button 1 -->
             <com.example.myfshop.utils.MSPButton
-                android:id="@+id/btn_option_1"
+                android:id="@+id/btn_all"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -71,13 +51,12 @@
                 android:gravity="center"
                 android:paddingTop="@dimen/btn_padding"
                 android:paddingBottom="@dimen/btn_padding"
-                android:text="Shirt"
+                android:text="All"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/btn_textSize" />
 
-            <!-- Button 2 -->
             <com.example.myfshop.utils.MSPButton
-                android:id="@+id/btn_option_2"
+                android:id="@+id/btn_shirt"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -87,7 +66,22 @@
                 android:gravity="center"
                 android:paddingTop="@dimen/btn_padding"
                 android:paddingBottom="@dimen/btn_padding"
-                android:text="Paint"
+                android:text="Shirt"
+                android:textColor="@android:color/white"
+                android:textSize="@dimen/btn_textSize" />
+
+            <com.example.myfshop.utils.MSPButton
+                android:id="@+id/btn_pants"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="8dp"
+                android:background="@drawable/button_background"
+                android:foreground="?attr/selectableItemBackground"
+                android:gravity="center"
+                android:paddingTop="@dimen/btn_padding"
+                android:paddingBottom="@dimen/btn_padding"
+                android:text="Pants"
                 android:textColor="@android:color/white"
                 android:textSize="@dimen/btn_textSize" />
 
@@ -95,7 +89,6 @@
 
     </LinearLayout>
 
-    <!-- RecyclerView to display dashboard items -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/rv_dashboard_items"
         android:layout_width="match_parent"
@@ -106,7 +99,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <!-- TextView to display when no dashboard items are found -->
     <TextView
         android:id="@+id/tv_no_dashboard_items_found"
         android:layout_width="match_parent"

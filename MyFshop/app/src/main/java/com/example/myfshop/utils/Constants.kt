@@ -45,9 +45,8 @@ object Constants {
     const val EXTRA_MY_ORDER_DETAILS: String = "extra_MY_ORDER_DETAILS"
     const val SOLD_PRODUCTS: String = "sold_products"
     const val EXTRA_SOLD_PRODUCT_DETAILS: String = "extra_sold_product_details"
-    const val ROLE = "role"
-//    const val ROLE_ADMIN = "admin"
-//    const val ROLE_USER = "user"
+    const val RATINGS: String = "ratings"
+
 
 
 

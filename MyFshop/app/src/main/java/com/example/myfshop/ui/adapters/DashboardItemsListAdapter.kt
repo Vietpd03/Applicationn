@@ -62,6 +62,7 @@ open class DashboardItemsListAdapter(
     override fun getItemCount(): Int {
         return list.size
     }
+
     interface OnClickListener {
         fun onClick(position: Int, product: Product)
     }

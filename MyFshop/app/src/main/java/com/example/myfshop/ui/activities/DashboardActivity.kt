@@ -45,9 +45,6 @@ class DashboardActivity : BaseActivity() {
         navView.setupWithNavController(navController)
 
     }
-
-
-
     @SuppressLint("MissingSuperCall")
     override fun onBackPressed() {
         doubleBackToExit()
