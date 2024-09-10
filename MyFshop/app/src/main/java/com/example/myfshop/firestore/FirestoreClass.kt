@@ -6,7 +6,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
 import android.util.Log
+import android.widget.Toast
 import androidx.fragment.app.Fragment
+import com.example.myfshop.R
 import com.example.myfshop.models.Address
 import com.example.myfshop.models.CartItem
 import com.example.myfshop.models.Order
@@ -22,6 +24,7 @@ import com.example.myfshop.ui.activities.AddProductActivity
 import com.example.myfshop.ui.activities.AddressListActivity
 import com.example.myfshop.ui.activities.CartListActivity
 import com.example.myfshop.ui.activities.CheckoutActivity
+import com.example.myfshop.ui.activities.EditProductActivity
 import com.example.myfshop.ui.activities.ProductDetailsActivity
 import com.example.myfshop.ui.activities.SettingsActivity
 import com.example.myfshop.ui.fragments.DashboardFragment
@@ -34,6 +37,8 @@ import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import  com.example.myfshop.ui.fragments.ProductsFragment
 import com.example.myfshop.ui.fragments.SoldProductsFragment
+import com.example.myfshop.ui.fragments.UserFragment
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.QuerySnapshot
 
 class FirestoreClass {
@@ -830,54 +835,42 @@ class FirestoreClass {
             }
     }
 
-    fun isAdmin(userId: String, callback: (Boolean) -> Unit) {
-        val userRef = FirebaseFirestore.getInstance().collection("users").document(userId)
-        userRef.get().addOnSuccessListener { document ->
-            if (document.exists()) {
-                val role = document.getString("role")
-                callback(role == "admin")
-            } else {
-                callback(false)
-            }
-        }.addOnFailureListener {
-            callback(false)
-        }
-    }
 
 
-    fun getUsersList(callback: (List<User>) -> Unit) {
-        FirebaseFirestore.getInstance().collection("users")
-            .get()
-            .addOnSuccessListener { result: QuerySnapshot ->
-                val usersList = ArrayList<User>()
-                for (document in result) {
-                    val user = document.toObject(User::class.java)
-                    usersList.add(user)
-                }
-                callback(usersList)
-            }
-            .addOnFailureListener {
-                callback(emptyList())
-            }
-    }
 
-    fun getUserDetails(userID: String, callback: (User?) -> Unit) {
-        FirebaseFirestore.getInstance().collection("users")
-            .document(userID)
-            .get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    val user = document.toObject(User::class.java)
-                    callback(user)
-                } else {
-                    callback(null) // Handle error: user not found
-                }
-            }
-            .addOnFailureListener { exception ->
-                // Handle failure
-                callback(null)
-            }
-    }
+//    fun getUsersList(callback: (List<User>) -> Unit) {
+//        FirebaseFirestore.getInstance().collection("users")
+//            .get()
+//            .addOnSuccessListener { result: QuerySnapshot ->
+//                val usersList = ArrayList<User>()
+//                for (document in result) {
+//                    val user = document.toObject(User::class.java)
+//                    usersList.add(user)
+//                }
+//                callback(usersList)
+//            }
+//            .addOnFailureListener {
+//                callback(emptyList())
+//            }
+//    }
+//
+//    fun getUserDetails(userID: String, callback: (User?) -> Unit) {
+//        FirebaseFirestore.getInstance().collection("users")
+//            .document(userID)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                if (document != null) {
+//                    val user = document.toObject(User::class.java)
+//                    callback(user)
+//                } else {
+//                    callback(null) // Handle error: user not found
+//                }
+//            }
+//            .addOnFailureListener { exception ->
+//                // Handle failure
+//                callback(null)
+//            }
+//    }
 
     fun getUserRatingForProduct(productId: String, userId: String, callback: (Rating?) -> Unit) {
         mFireStore.collection(Constants.RATINGS)
@@ -963,6 +956,92 @@ class FirestoreClass {
                 callback(0f)
             }
     }
+
+    fun getUsersList(fragment: UserFragment) {
+        mFireStore.collection(Constants.USERS)
+            .get()
+            .addOnSuccessListener { document ->
+                val usersList: ArrayList<User> = ArrayList()
+                for (i in document.documents) {
+                    val user = i.toObject(User::class.java)!!
+                    user.id = i.id
+                    usersList.add(user)
+                }
+                fragment.successUsersListFromFireStore(usersList)
+            }
+            .addOnFailureListener { e ->
+                fragment.userDeleteFailure(e)
+            }
+    }
+
+    fun deleteUser(fragment: UserFragment, userId: String) {
+        mFireStore.collection(Constants.USERS)
+            .document(userId)
+            .delete()
+            .addOnSuccessListener {
+                fragment.userDeleteSuccess()
+            }
+            .addOnFailureListener { e ->
+                fragment.userDeleteFailure(e)
+            }
+    }
+
+    fun getUserDetails(userId: String) = mFireStore.collection("users").document(userId).get()
+
+    fun updateUserDetails(userId: String, userHashMap: HashMap<String, Any>) =
+        mFireStore.collection("users").document(userId).update(userHashMap)
+
+
+    fun getProductDetails(productId: String, callback: ProductDetailsCallback) {
+        // Fetch product details from Firestore
+        FirebaseFirestore.getInstance().collection("products").document(productId).get()
+            .addOnSuccessListener { document ->
+                val product = document.toObject(Product::class.java)
+                if (product != null) callback.onSuccess(product)
+            }
+            .addOnFailureListener { exception ->
+                callback.onFailure(exception)
+            }
+    }
+
+    fun addProduct(product: Product, callback: (Boolean) -> Unit) {
+        // Add product to Firestore
+        FirebaseFirestore.getInstance().collection("products").add(product)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+
+    fun updateProduct(productId: String, product: Product, callback: (Boolean) -> Unit) {
+        // Update product in Firestore
+        FirebaseFirestore.getInstance().collection("products").document(productId).set(product)
+            .addOnSuccessListener { callback(true) }
+            .addOnFailureListener { callback(false) }
+    }
+//    fun updateProductDetails(activity: EditProductActivity, productId: String, productHashMap: HashMap<String, Any>) {
+//        mFireStore.collection(Constants.PRODUCTS)
+//            .document(productId)
+//            .update(productHashMap)
+//            .addOnSuccessListener {
+//                activity.productUpdateSuccess()
+//            }
+//            .addOnFailureListener { e ->
+//                activity.hideProgressDialog()
+//                Log.e(activity.javaClass.simpleName, "Error while updating the product details.", e)
+//            }
+//    }
+    fun updateProductDetails(activity: Activity, productId: String, productHashMap: HashMap<String, Any>): Task<Void> {
+        return FirebaseFirestore.getInstance()
+            .collection(Constants.PRODUCTS)
+            .document(productId)
+            .update(productHashMap)
+    }
+
+
+    interface ProductDetailsCallback {
+        fun onSuccess(product: Product)
+        fun onFailure(exception: Exception)
+    }
+
 }
 
 

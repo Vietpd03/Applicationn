@@ -29,40 +29,40 @@
 
     <!-- User's Name and Email -->
     <LinearLayout
-        android:id="@+id/ll_product_details"
+        android:id="@+id/ll_user_details"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="@dimen/item_image_title_price_marginStart"
         android:layout_marginEnd="@dimen/item_image_title_price_marginStart"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/ib_delete_product"
+        app:layout_constraintEnd_toStartOf="@id/ib_delete_user"
         app:layout_constraintStart_toEndOf="@id/ll_item_image"
         app:layout_constraintTop_toTopOf="parent">
 
         <!-- User's Name -->
         <com.example.myfshop.utils.MSVTextViewBold
-            android:id="@+id/tv_item_name"
+            android:id="@+id/tv_user_name"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textColor="@color/item_value_text_color"
             android:textSize="@dimen/rv_item_name_textSize"
-            tools:text="Balenmechoida" />
+            tools:text="product" />
 
         <!-- User's Email -->
         <com.example.myfshop.utils.MSVTextView
-            android:id="@+id/tv_item_price"
+            android:id="@+id/tv_user_email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="@dimen/rv_item_price_marginTop"
             android:textColor="@color/item_value_text_color"
             android:textSize="@dimen/rv_item_price_textSize"
-            tools:text="100000vnd" />
+            tools:text="johndoe@example.com" />
     </LinearLayout>
 
     <!-- Delete Button -->
     <ImageButton
-        android:id="@+id/ib_delete_product"
+        android:id="@+id/ib_delete_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -71,12 +71,12 @@
         android:padding="@dimen/delete_icon_padding"
         android:src="@drawable/ic_vector_delete"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ll_product_details"
+        app:layout_constraintStart_toEndOf="@id/ll_user_details"
         app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Edit Profile Button -->
     <ImageButton
-        android:id="@+id/ib_edit_product"
+        android:id="@+id/ib_edit_user"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:background="@android:color/transparent"
@@ -85,7 +85,7 @@
         android:padding="@dimen/delete_icon_padding"
         android:src="@drawable/ic_vector_add"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/ll_product_details"
-        app:layout_constraintTop_toBottomOf="@id/ib_delete_product" />
+        app:layout_constraintStart_toEndOf="@id/ll_user_details"
+        app:layout_constraintTop_toBottomOf="@id/ib_delete_user" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

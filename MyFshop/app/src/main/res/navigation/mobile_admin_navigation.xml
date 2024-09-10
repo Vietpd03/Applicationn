@@ -31,7 +31,7 @@
 
     <fragment
         android:id="@+id/navigation_user"
-        android:name="com.example.myfshop.ui.fragments.UsersFragment"
+        android:name="com.example.myfshop.ui.fragments.UserFragment"
         android:label="@string/title_user"
         tools:layout="@layout/fragment_users" />
 </navigation>

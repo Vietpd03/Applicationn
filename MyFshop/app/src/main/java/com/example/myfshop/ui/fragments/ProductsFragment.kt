@@ -1,5 +1,6 @@
 package com.example.myfshop.ui.fragments
 
+import android.app.Activity.RESULT_OK
 import android.app.AlertDialog
 import android.content.Intent
 import android.os.Bundle
@@ -14,6 +15,7 @@ import com.example.myfshop.models.Product
 import com.example.myfshop.ui.activities.AddProductActivity
 import com.example.myfshop.ui.adapters.MyProductsListAdapter
 import com.example.myfshop.ui.fragments.BaseFragment
+import com.example.myfshop.utils.Constants
 
 class ProductsFragment : BaseFragment() {
 
@@ -22,6 +24,7 @@ class ProductsFragment : BaseFragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setHasOptionsMenu(true)
+
     }
 
     override fun onCreateView(
@@ -50,13 +53,20 @@ class ProductsFragment : BaseFragment() {
 
     override fun onResume() {
         super.onResume()
+        val isUpdated = activity?.intent?.getBooleanExtra("isProductUpdated", false) ?: false
+
+        if (isUpdated) {
+            getProductListFromFireStore()  // Refresh the product list
+        }
 
         getProductListFromFireStore()
+        hideProgressDialog()
     }
 
     private fun getProductListFromFireStore() {
         showProgressDialog(resources.getString(R.string.please_wait))
         FirestoreClass().getProductsList(this@ProductsFragment)
+        hideProgressDialog()
     }
 
     fun successProductsListFromFireStore(productsList: ArrayList<Product>) {
@@ -82,6 +92,7 @@ class ProductsFragment : BaseFragment() {
     }
 
     fun deleteProduct(productID: String) {
+        //hideProgressDialog()
         showAlertDialogToDeleteProduct(productID)
     }
 
@@ -120,4 +131,12 @@ class ProductsFragment : BaseFragment() {
         alertDialog.setCancelable(false)
         alertDialog.show()
     }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if (requestCode == Constants.EDIT_PRODUCT_REQUEST_CODE && resultCode == RESULT_OK) {
+            getProductListFromFireStore() // Refresh product list after editing
+        }
+    }
+
 }

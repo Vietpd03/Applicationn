@@ -1,60 +1,94 @@
 package com.example.myfshop.ui.fragments
 
+import android.content.Intent
 import android.os.Bundle
-import androidx.fragment.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.myfshop.R
+import com.example.myfshop.firestore.FirestoreClass
+import com.example.myfshop.models.User
+import com.example.myfshop.ui.activities.EditUserProfileActivity
+import com.example.myfshop.ui.adapters.UsersListAdapter
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
+class UserFragment : Fragment() {
 
-/**
- * A simple [Fragment] subclass.
- * Use the [UsersFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
-class UsersFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    private lateinit var mUsersList: ArrayList<User>
+    private lateinit var mAdapter: UsersListAdapter
+    private lateinit var mRecyclerView: RecyclerView
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_users, container, false)
+        val root = inflater.inflate(R.layout.fragment_users, container, false)
+
+        mRecyclerView = root.findViewById(R.id.rv_users_list)
+        mRecyclerView.layoutManager = LinearLayoutManager(activity)
+        mRecyclerView.setHasFixedSize(true)
+
+        return root
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment UsersFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            UsersFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onResume() {
+        super.onResume()
+        getUsersList()
+    }
+
+    fun onEditClick(position: Int) {
+        val intent = Intent(activity, EditUserProfileActivity::class.java)
+        intent.putExtra("user_id", mUsersList[position].id)
+        startActivity(intent)
+    }
+
+
+    private fun getUsersList() {
+        FirestoreClass().getUsersList(this@UserFragment)
+    }
+
+    fun successUsersListFromFireStore(usersList: ArrayList<User>) {
+        mUsersList = usersList
+
+        if (mUsersList.size > 0) {
+            mRecyclerView.visibility = View.VISIBLE
+
+            mAdapter = UsersListAdapter(requireContext(), mUsersList)
+            mRecyclerView.adapter = mAdapter
+
+            mAdapter.setOnItemClickListener(object : UsersListAdapter.OnItemClickListener {
+                override fun onDeleteClick(position: Int) {
+                    deleteUser(mUsersList[position].id)
                 }
-            }
+
+                override fun onEditClick(position: Int) {
+                    val intent = Intent(activity, EditUserProfileActivity::class.java)
+                    intent.putExtra("user_id", mUsersList[position].id)
+                    startActivity(intent)
+                }
+            })
+
+        } else {
+            mRecyclerView.visibility = View.GONE
+        }
+    }
+
+    private fun deleteUser(userId: String) {
+        FirestoreClass().deleteUser(this@UserFragment, userId)
+    }
+
+    fun userDeleteSuccess() {
+        Toast.makeText(activity, "User deleted successfully", Toast.LENGTH_SHORT).show()
+        getUsersList()
+    }
+
+    fun userDeleteFailure(e: Exception) {
+        Log.e(javaClass.simpleName, "Error while deleting the user.", e)
+        Toast.makeText(activity, "Error while deleting the user", Toast.LENGTH_SHORT).show()
     }
 }
+

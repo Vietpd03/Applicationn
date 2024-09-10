@@ -134,11 +134,13 @@
     <string name="title_notifications">Notifications</string>
     <string name="title_admin_dashboard">AdminDashboard</string>
     <string name="title_user">User</string>
+    <string name="err_msg_product_details">Failed to load product details.</string>
+
     <string-array name="product_category_array">
         <item>Pant</item>
         <item>Shirt</item>
     </string-array>
-    <string name="title_edit_product">Edit Product</string>
+    <string name="title_edit_product">EDIT PRODUCT</string>
     <string name="edit_product">Edit Product</string>
     <string name="product_update_success_message">Product updated successfully.</string>
     <string-array name="product_sizes">

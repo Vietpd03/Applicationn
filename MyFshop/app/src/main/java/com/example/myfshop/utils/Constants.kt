@@ -46,8 +46,10 @@ object Constants {
     const val SOLD_PRODUCTS: String = "sold_products"
     const val EXTRA_SOLD_PRODUCT_DETAILS: String = "extra_sold_product_details"
     const val RATINGS: String = "ratings"
-
-
+    const val EDIT_PRODUCT_REQUEST_CODE = 1001
+    const val TITLE: String = "title"
+    const val PRICE: String = "price"
+    const val DESCRIPTION: String = "description"
 
 
     fun showImageChooser(activity: Activity) {

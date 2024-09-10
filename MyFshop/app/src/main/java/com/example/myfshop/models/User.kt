@@ -2,7 +2,7 @@ package com.example.myfshop.models
 import java.io.Serializable
 
 data class User(
-    val id: String = "",
+    var id: String = "",
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
