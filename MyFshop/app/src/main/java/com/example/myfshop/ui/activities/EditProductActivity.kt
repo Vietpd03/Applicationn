@@ -3,6 +3,7 @@ package com.example.myfshop.ui.activities
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.myfshop.R
@@ -31,6 +32,7 @@ class EditProductActivity : BaseActivity() {
         }
 
         setupActionBar()
+        //setupCategorySpinner()
 
         binding.ivAddUpdateProduct.setOnClickListener {
             // Logic to upload a new image or change the current one.
@@ -42,6 +44,9 @@ class EditProductActivity : BaseActivity() {
                 //hideProgressDialog()
             }
         }
+        setupCategorySpinner("Category")
+        //setupCategorySpinner()
+
     }
 
     private fun setupActionBar() {
@@ -67,7 +72,10 @@ class EditProductActivity : BaseActivity() {
                     binding.etProductPrice.setText(mProductDetails.price)
                     binding.etProductDescription.setText(mProductDetails.description)
                     binding.etProductQuantity.setText(mProductDetails.stock_quantity)
+                    //binding.spinnerProductCategory.setSelection(mProductDetails.category)
                     GlideLoader(this).loadProductPicture(mProductDetails.image, binding.ivProductImage)
+
+                    setupCategorySpinner(mProductDetails.category)
                 }
                 .addOnFailureListener { e ->
                     showErrorSnackBar("Failed to load product details.", true)
@@ -95,6 +103,11 @@ class EditProductActivity : BaseActivity() {
                 showErrorSnackBar(resources.getString(R.string.err_msg_enter_product_quantity), true)
                 false
             }
+            binding.spinnerProductCategory.selectedItem.toString() == "Category" -> {
+                showErrorSnackBar(resources.getString(R.string.err_msg_enter_product_quantity), true)
+                false
+            }
+
             else -> {
                 true
             }
@@ -109,7 +122,7 @@ class EditProductActivity : BaseActivity() {
         productHashMap[Constants.PRICE] = binding.etProductPrice.text.toString().trim()
         productHashMap[Constants.DESCRIPTION] = binding.etProductDescription.text.toString().trim()
         productHashMap[Constants.STOCK_QUANTITY] = binding.etProductQuantity.text.toString().trim()
-
+        productHashMap[Constants.CATEGORY]= binding.spinnerProductCategory.selectedItem.toString()
         mProductId?.let { id ->
             FirestoreClass().updateProductDetails(this, id, productHashMap)
                 .addOnSuccessListener {
@@ -128,6 +141,16 @@ class EditProductActivity : BaseActivity() {
         }
         hideProgressDialog()
     }
+    private fun setupCategorySpinner(selectedCategory: String) {
+        val categories = resources.getStringArray(R.array.product_category_array)
+        val adapter = ArrayAdapter(this, android.R.layout.simple_spinner_item, categories)
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.spinnerProductCategory.adapter = adapter
+
+        val categoryPosition = adapter.getPosition(selectedCategory)
+        binding.spinnerProductCategory.setSelection(categoryPosition)
+    }
+
 
     fun productUpdateSuccess() {
         hideProgressDialog()
@@ -136,5 +159,10 @@ class EditProductActivity : BaseActivity() {
         finish()
         //hideProgressDialog()
 
+    }
+
+    fun productUpdateFailure() {
+        hideProgressDialog()
+        Toast.makeText(this@EditProductActivity, "Failed to update product.", Toast.LENGTH_SHORT).show()
     }
 }

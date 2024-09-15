@@ -50,7 +50,7 @@ object Constants {
     const val TITLE: String = "title"
     const val PRICE: String = "price"
     const val DESCRIPTION: String = "description"
-
+    const val CATEGORY: String = "category"
 
     fun showImageChooser(activity: Activity) {
         // An intent for launching the image selection of phone storage.
