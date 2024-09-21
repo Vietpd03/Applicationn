@@ -7,6 +7,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -121,11 +122,13 @@ class CheckoutActivity : BaseActivity() {
         val tvCheckoutTotalAmount = findViewById<TextView>(R.id.tv_checkout_total_amount)
 
         for (item in mCartItemsList) {
-            val availableQuantity = item.stock_quantity.toInt()
-            if (availableQuantity > 0) {
-                val price = item.price.toDouble()
-                val quantity = item.cart_quantity.toInt()
-                mSubTotal += (price * quantity)
+            if (item.stock_quantity.isNotEmpty() && item.cart_quantity.isNotEmpty()) {
+                val availableQuantity = item.stock_quantity.toInt()
+                if (availableQuantity > 0) {
+                    val price = item.price.toDouble()
+                    val quantity = item.cart_quantity.toInt()
+                    mSubTotal += (price * quantity)
+                }
             }
         }
 
@@ -144,7 +147,6 @@ class CheckoutActivity : BaseActivity() {
     private fun placeAnOrder() {
         showProgressDialog(resources.getString(R.string.please_wait))
 
-        // Assuming all items in the cart have the same size, we take the size from the first item.
         val selectedSize = mCartItemsList[0].size
 
         mOrderDetails = Order(
@@ -154,10 +156,10 @@ class CheckoutActivity : BaseActivity() {
             "My order ${System.currentTimeMillis()}",
             mCartItemsList[0].image,
             mSubTotal.toString(),
-            "10.0", // The Shipping Charge is fixed as $10 for now in our case.
+            "10.0",
             mTotalAmount.toString(),
             System.currentTimeMillis(),
-            size = selectedSize // Pass the selected size
+            size = selectedSize
         )
 
         FirestoreClass().placeOrder(this@CheckoutActivity, mOrderDetails)

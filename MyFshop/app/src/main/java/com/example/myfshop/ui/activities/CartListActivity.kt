@@ -35,6 +35,7 @@ class CartListActivity : BaseActivity() {
             insets
         }
         setupActionBar()
+
         val btn_checkout = findViewById<TextView>(R.id.btn_checkout)
         btn_checkout.setOnClickListener {
             val intent = Intent(this@CartListActivity, AddressListActivity::class.java)
@@ -42,32 +43,26 @@ class CartListActivity : BaseActivity() {
             startActivity(intent)
         }
     }
+
     private fun setupActionBar() {
         val toolbar_cart_list_activity = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_cart_list_activity)
-
         setSupportActionBar(toolbar_cart_list_activity)
-
         val actionBar = supportActionBar
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true)
             actionBar.setHomeAsUpIndicator(R.drawable.ic_white_color_back_24dp)
         }
-
         toolbar_cart_list_activity.setNavigationOnClickListener { onBackPressed() }
     }
 
     fun successCartItemsList(cartList: ArrayList<CartItem>) {
-
-        // Hide progress dialog.
         hideProgressDialog()
 
         for (product in mProductsList) {
             for (cart in cartList) {
                 if (product.product_id == cart.product_id) {
-
                     cart.stock_quantity = product.stock_quantity
-
-                    if (product.stock_quantity.toInt() == 0){
+                    if (product.stock_quantity.isNotEmpty() && product.stock_quantity.toInt() == 0) {
                         cart.cart_quantity = product.stock_quantity
                     }
                 }
@@ -98,11 +93,13 @@ class CartListActivity : BaseActivity() {
             var subTotal: Double = 0.0
 
             for (item in mCartListItems) {
-                val availableQuantity = item.stock_quantity.toInt()
-                if(availableQuantity > 0){
-                    val price = item.price.toDouble()
-                    val quantity = item.cart_quantity.toInt()
-                    subTotal += (price * quantity)
+                if (item.stock_quantity.isNotEmpty() && item.cart_quantity.isNotEmpty()) {
+                    val availableQuantity = item.stock_quantity.toInt()
+                    if (availableQuantity > 0) {
+                        val price = item.price.toDouble()
+                        val quantity = item.cart_quantity.toInt()
+                        subTotal += (price * quantity)
+                    }
                 }
             }
 
@@ -116,7 +113,6 @@ class CartListActivity : BaseActivity() {
             } else {
                 llCheckout.visibility = View.GONE
             }
-
         } else {
             rvCartItemsList.visibility = View.GONE
             llCheckout.visibility = View.GONE
@@ -135,7 +131,6 @@ class CartListActivity : BaseActivity() {
         FirestoreClass().getAllProductsList(this@CartListActivity)
     }
 
-
     private fun getCartItemsList() {
         //showProgressDialog(resources.getString(R.string.please_wait))
         FirestoreClass().getCartList(this@CartListActivity)
@@ -145,26 +140,20 @@ class CartListActivity : BaseActivity() {
         super.onResume()
         //getCartItemsList()
         getProductList()
-
     }
 
     fun itemRemovedSuccess() {
-
         hideProgressDialog()
-
         Toast.makeText(
             this@CartListActivity,
             resources.getString(R.string.msg_item_removed_successfully),
             Toast.LENGTH_SHORT
         ).show()
-
         getCartItemsList()
     }
 
     fun itemUpdateSuccess() {
-
         hideProgressDialog()
-
         getCartItemsList()
     }
 }

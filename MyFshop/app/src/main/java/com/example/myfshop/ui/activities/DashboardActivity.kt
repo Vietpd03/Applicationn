@@ -15,7 +15,6 @@ import com.example.myfshop.ui.fragments.DashboardFragment
 
 class DashboardActivity : BaseActivity() {
 
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_dashboard)

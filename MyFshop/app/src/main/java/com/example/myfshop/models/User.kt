@@ -10,5 +10,5 @@ data class User(
     val mobile: Long = 0,
     val gender: String = "",
     val profileCompleted: Int = 0,
-    val role: String = ""
+    val role: String = "user"
 ): Serializable

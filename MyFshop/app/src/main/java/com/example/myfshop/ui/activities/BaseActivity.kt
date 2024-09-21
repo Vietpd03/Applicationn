@@ -34,11 +34,7 @@ open class BaseActivity : AppCompatActivity() {
                 )
             )
         }
-//        if (errorMessage) {
-//            snackBarView.setBackgroundColor(resources.getColor(R.color.snackbar_error_color))
-//        } else {
-//            snackBarView.setBackgroundColor(resources.getColor(R.color.snackbar_success_color))
-//        }
+
         snackBar.show()
     }
 

@@ -57,13 +57,9 @@ open class AddressListAdapter(
 
     fun notifyEditItem(activity: Activity, position: Int) {
         val intent = Intent(context, AddEditAddressActivity::class.java)
-        // TODO Step 6: Pass the address details through intent to edit the address.
-        // START
         intent.putExtra(Constants.EXTRA_ADDRESS_DETAILS, list[position])
-        // END
         activity.startActivityForResult(intent, Constants.ADD_ADDRESS_REQUEST_CODE)
-
-        notifyItemChanged(position) // Notify any registered observers that the item at position has changed.
+        notifyItemChanged(position)
     }
 
     private class MyViewHolder(view: View) : RecyclerView.ViewHolder(view)

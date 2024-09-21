@@ -103,7 +103,7 @@ class ProductDetailsActivity : BaseActivity(), View.OnClickListener {
         val btnAddToCart = findViewById<com.example.myfshop.utils.MSPButton>(R.id.btn_add_to_cart)
         val btnGoToCart = findViewById<com.example.myfshop.utils.MSPButton>(R.id.btn_go_to_cart)
 
-        if (FirestoreClass().getCurrentUserID() == mProductOwnerId) {
+        if (FirestoreClass().getCurrentUserID() == "XzZ4uM0LuRaBjTG3rI24zru0CcG2") {
             btnAddToCart.visibility = View.GONE
             btnGoToCart.visibility = View.GONE
         } else {

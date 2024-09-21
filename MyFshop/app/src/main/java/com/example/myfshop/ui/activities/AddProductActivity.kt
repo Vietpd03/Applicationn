@@ -98,11 +98,9 @@ class AddProductActivity : BaseActivity() , View.OnClickListener{
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == Constants.READ_MEDIA_IMAGES_PERMISSION_CODE) {
-            //If permission is granted
             if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Constants.showImageChooser(this@AddProductActivity)
             } else {
-                //Displaying another toast if permission is not granted
                 Toast.makeText(
                     this,
                     resources.getString(R.string.read_storage_permission_denied),

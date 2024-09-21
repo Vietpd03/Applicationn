@@ -108,7 +108,6 @@ class EditUserProfileActivity : AppCompatActivity() {
             updateUserProfile(userHashMap)
         }
 
-        // Update user data in Firestore
         FirestoreClass().updateUserDetails(userId, userHashMap)
             .addOnSuccessListener {
                 Toast.makeText(this, "User profile updated successfully", Toast.LENGTH_SHORT).show()

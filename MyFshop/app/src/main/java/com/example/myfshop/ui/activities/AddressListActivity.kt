@@ -65,7 +65,6 @@ class AddressListActivity : BaseActivity() {
         hideProgressDialog()
         if (addressList.size > 0) {
 
-            // Access the RecyclerView and TextView using findViewById
             val rvAddressList = findViewById<RecyclerView>(R.id.rv_address_list)
             val tvNoAddressFound = findViewById<TextView>(R.id.tv_no_address_found)
 
@@ -94,7 +93,6 @@ class AddressListActivity : BaseActivity() {
                 val deleteSwipeHandler = object : SwipeToDeleteCallback(this) {
                     override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
 
-                        // Show the progress dialog.
                         showProgressDialog(resources.getString(R.string.please_wait))
 
                         FirestoreClass().deleteAddress(
@@ -110,7 +108,6 @@ class AddressListActivity : BaseActivity() {
                 editItemTouchHelper.attachToRecyclerView(rv_address_list)
             }
         } else {
-            // Access the RecyclerView and TextView using findViewById
             val rvAddressList = findViewById<RecyclerView>(R.id.rv_address_list)
             val tvNoAddressFound = findViewById<TextView>(R.id.tv_no_address_found)
 

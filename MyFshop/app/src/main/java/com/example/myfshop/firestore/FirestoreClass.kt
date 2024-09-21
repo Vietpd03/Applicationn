@@ -76,62 +76,6 @@ class FirestoreClass {
         return currentUserID
     }
 
-    //    fun getUserDetails(activity: Activity) {
-//        mFireStore.collection(Constants.USERS)
-//            .document(getCurrentUserID())
-//            .get()
-//            .addOnSuccessListener { document ->
-//
-//                Log.i(activity.javaClass.simpleName, "Document: ${document.data}")
-//
-//                val user = document.toObject(User::class.java)!!
-//
-//                // Ghi log giá trị của role
-//                Log.i(activity.javaClass.simpleName, "User role: ${user.role}")
-//
-//                val sharedPreferences =
-//                    activity.getSharedPreferences(
-//                        Constants.MYFSHOP_PREFERENCES,
-//                        Context.MODE_PRIVATE
-//                    )
-//
-//                val editor: SharedPreferences.Editor = sharedPreferences.edit()
-//                editor.putString(
-//                    Constants.LOGGED_IN_USERNAME,
-//                    "${user.firstName} ${user.lastName}"
-//                )
-//                editor.apply()
-//
-//                when (activity) {
-//                    is LoginActivity -> {
-//                        activity.userLoggedInSuccess(user)
-//                    }
-//
-//                    is SettingsActivity -> {
-//                        activity.userDetailsSuccess(user)
-//                    }
-//                }
-//
-//            }
-//            .addOnFailureListener { e ->
-//                when (activity) {
-//                    is LoginActivity -> {
-//                        activity.hideProgressDialog()
-//                    }
-//
-//                    is SettingsActivity -> {
-//                        activity.hideProgressDialog()
-//                    }
-//                }
-//
-//                Log.e(
-//                    activity.javaClass.simpleName,
-//                    "Error while getting user details.",
-//                    e
-//                )
-//            }
-//    }
-//
     fun getUserDetails(activity: Activity) {
 
         mFireStore.collection(Constants.USERS)
@@ -722,8 +666,8 @@ class FirestoreClass {
 
     fun updateAllDetails(activity: CheckoutActivity, cartList: ArrayList<CartItem>, order: Order) {
         val writeBatch = mFireStore.batch()
-        for (cart in cartList) {
 
+        for (cart in cartList) {
             val soldProduct = SoldProduct(
                 "XzZ4uM0LuRaBjTG3rI24zru0CcG2",
                 cart.title,
@@ -738,41 +682,45 @@ class FirestoreClass {
                 order.address,
                 "",
                 order.size
-
             )
             val documentReference = mFireStore.collection(Constants.SOLD_PRODUCTS)
                 .document()
             writeBatch.set(documentReference, soldProduct)
         }
+
         for (cart in cartList) {
-
-            val productHashMap = HashMap<String, Any>()
-
-            productHashMap[Constants.STOCK_QUANTITY] =
-                (cart.stock_quantity.toInt() - cart.cart_quantity.toInt()).toString()
-
-            val documentReference = mFireStore.collection(Constants.PRODUCTS)
-                .document(cart.product_id)
-
-            writeBatch.update(documentReference, productHashMap)
+            if (cart.stock_quantity.isNotEmpty() && cart.cart_quantity.isNotEmpty()) {
+                try {
+                    val stockQuantity = cart.stock_quantity.toInt()
+                    val cartQuantity = cart.cart_quantity.toInt()
+                    val productHashMap = HashMap<String, Any>()
+                    productHashMap[Constants.STOCK_QUANTITY] = (stockQuantity - cartQuantity).toString()
+                    val documentReference = mFireStore.collection(Constants.PRODUCTS)
+                        .document(cart.product_id)
+                    writeBatch.update(documentReference, productHashMap)
+                } catch (e: NumberFormatException) {
+                    e.printStackTrace()
+                    // Handle the invalid number format case
+                    Log.e(activity.javaClass.simpleName, "Invalid number format for stock or cart quantity", e)
+                }
+            } else {
+                // Handle the case where stock_quantity or cart_quantity is empty
+                Log.e(activity.javaClass.simpleName, "Stock quantity or cart quantity is empty for product: ${cart.product_id}")
+            }
         }
 
         // Delete the list of cart items
         for (cart in cartList) {
-
             val documentReference = mFireStore.collection(Constants.CART_ITEMS)
                 .document(cart.id)
             writeBatch.delete(documentReference)
         }
 
         writeBatch.commit().addOnSuccessListener {
-
             activity.allDetailsUpdatedSuccessfully()
-
         }.addOnFailureListener { e ->
             // Here call a function of base activity for transferring the result to it.
             activity.hideProgressDialog()
-
             Log.e(
                 activity.javaClass.simpleName,
                 "Error while updating all the details after order placed.",
