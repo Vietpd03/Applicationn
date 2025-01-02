@@ -1,0 +1,80 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorOffWhite"
+    tools:context=".ui.fragments.ChartsFragment">
+
+    <!-- Toolbar -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_charts"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="@drawable/app_gradient_color_background"
+        android:elevation="4dp">
+
+        <TextView
+            android:id="@+id/tv_charts_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="Revenue Charts"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- Scrollable Content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/toolbar_charts"
+        android:fillViewport="true"
+        android:padding="16dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Title for Revenue Chart -->
+            <TextView
+                android:id="@+id/tv_revenue_chart_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="8dp"
+                android:text="Monthly Revenue"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/black" />
+
+            <!-- Bar Chart -->
+
+            <com.github.mikephil.charting.charts.BarChart
+                android:id="@+id/chartRevenue"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginBottom="24dp"
+                android:background="@color/white"
+                android:elevation="2dp" />
+
+            <!-- Placeholder for Future Charts -->
+            <com.github.mikephil.charting.charts.LineChart
+                android:id="@+id/chartLine"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginBottom="24dp"
+                android:background="@color/white"
+                android:elevation="2dp" />
+
+            <com.github.mikephil.charting.charts.PieChart
+                android:id="@+id/chartPie"
+                android:layout_width="match_parent"
+                android:layout_height="400dp"
+                android:layout_marginBottom="24dp"
+                android:background="@color/white"
+                android:elevation="2dp" />
+
+        </LinearLayout>
+    </ScrollView>
+</RelativeLayout>

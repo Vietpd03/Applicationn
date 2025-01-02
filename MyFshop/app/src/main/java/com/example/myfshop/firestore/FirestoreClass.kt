@@ -5,8 +5,11 @@ import android.content.ContentValues.TAG
 import android.content.Context
 import android.content.SharedPreferences
 import android.net.Uri
+import android.provider.Settings.Global.getString
 import android.util.Log
 import android.widget.Toast
+import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import com.example.myfshop.R
 import com.example.myfshop.models.Address
@@ -38,8 +41,12 @@ import com.google.firebase.storage.StorageReference
 import  com.example.myfshop.ui.fragments.ProductsFragment
 import com.example.myfshop.ui.fragments.SoldProductsFragment
 import com.example.myfshop.ui.fragments.UserFragment
+import com.github.mikephil.charting.data.BarEntry
+import com.github.mikephil.charting.data.Entry
+import com.github.mikephil.charting.data.PieEntry
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.QuerySnapshot
+import java.util.Calendar
 
 class FirestoreClass {
     private val mFireStore = FirebaseFirestore.getInstance()
@@ -782,6 +789,75 @@ class FirestoreClass {
                 )
             }
     }
+//    fun getSoldProductsList(fragment: SoldProductsFragment) {
+//        val currentAdminId = getCurrentUserID() // Lấy ID của admin (người bán)
+//        FirebaseFirestore.getInstance()
+//            .collection("SoldProducts")
+//            .whereEqualTo("user_id", currentAdminId) // So sánh với ID admin
+//            .get()
+//            .addOnSuccessListener { document ->
+//                val soldProductsList = ArrayList<SoldProduct>()
+//                for (doc in document.documents) {
+//                    val soldProduct = doc.toObject(SoldProduct::class.java)
+//                    if (soldProduct != null) {
+//                        soldProductsList.add(soldProduct)
+//                    }
+//                }
+//                fragment.successSoldProductsList(soldProductsList)
+//            }
+//            .addOnFailureListener { e ->
+//                fragment.hideProgressDialog()
+//                Log.e("Firestore Error", "Error while getting sold products list.", e)
+//            }
+//    }
+
+//    fun getSoldProductsList(
+//        onSuccess: (ArrayList<SoldProduct>) -> Unit,
+//        onFailure: (Exception) -> Unit
+//    ) {
+//        val currentUserId = getCurrentUserID()
+//        FirebaseFirestore.getInstance()
+//            .collection("SoldProducts")
+//            .whereEqualTo("user_id", currentUserId)
+//            .get()
+//            .addOnSuccessListener { document ->
+//                val soldProductsList = ArrayList<SoldProduct>()
+//                for (doc in document.documents) {
+//                    val soldProduct = doc.toObject(SoldProduct::class.java)
+//                    if (soldProduct != null) {
+//                        soldProductsList.add(soldProduct)
+//                    }
+//                }
+//                onSuccess(soldProductsList)
+//            }
+//            .addOnFailureListener { e ->
+//                onFailure(e)
+//            }
+//    }
+
+
+//   fun getSoldProductsList(fragment: SoldProductsFragment) {
+//    val currentUserId = getCurrentUserID() // Lấy ID người dùng hiện tại
+//    FirebaseFirestore.getInstance()
+//        .collection("SoldProducts")
+//        .whereEqualTo("user_id", currentUserId) // Lọc theo user_id của admin (người bán)
+//        .get()
+//        .addOnSuccessListener { document ->
+//            val soldProductsList = ArrayList<SoldProduct>()
+//            for (doc in document.documents) {
+//                // Chuyển đổi tài liệu Firestore thành đối tượng SoldProduct
+//                val soldProduct = doc.toObject(SoldProduct::class.java)
+//                if (soldProduct != null) {
+//                    soldProductsList.add(soldProduct)
+//                }
+//            }
+//            fragment.successSoldProductsList(soldProductsList)
+//        }
+//        .addOnFailureListener { e ->
+//            fragment.hideProgressDialog()
+//            Log.e("Firestore Error", "Error while getting sold products list.", e)
+//        }
+//}
 
 
 
@@ -989,6 +1065,158 @@ class FirestoreClass {
         fun onSuccess(product: Product)
         fun onFailure(exception: Exception)
     }
+
+    fun getStatistics(callback: (StatisticsData?) -> Unit) {
+        val db = FirebaseFirestore.getInstance()
+
+        // Dummy collection paths: "orders", "users"
+        db.collection("statistics").get().addOnSuccessListener { documents ->
+            val orders = mutableMapOf<String, Int>()
+            val users = mutableMapOf<String, Int>()
+
+            for (doc in documents) {
+                when (doc.id) {
+                    "orders" -> {
+                        doc.data.forEach { (key, value) ->
+                            orders[key] = (value as Long).toInt()
+                        }
+                    }
+                    "users" -> {
+                        doc.data.forEach { (key, value) ->
+                            users[key] = (value as Long).toInt()
+                        }
+                    }
+                }
+            }
+
+            callback(StatisticsData(orders, users))
+        }.addOnFailureListener {
+            callback(null)
+        }
+    }
+
+    data class StatisticsData(
+        val orders: Map<String, Int>,
+        val users: Map<String, Int>
+    )
+
+//    private fun getRevenueDataByMonth() {
+//        // Hiển thị Progress Dialog
+//        showProgressDialog(getString(R.string.please_wait))
+//
+//        // Gọi FirestoreClass để lấy danh sách đơn hàng
+//        FirestoreClass().getAllOrders { ordersList ->
+//            hideProgressDialog()
+//
+//            if (ordersList.isNotEmpty()) {
+//                val revenueByMonth = mutableMapOf<String, Float>()
+//
+//                // Duyệt qua danh sách đơn hàng
+//                for (order in ordersList) {
+//                    // Chuyển đổi timestamp sang định dạng tháng
+//                    val calendar = Calendar.getInstance()
+//                    calendar.timeInMillis = order.order_datetime
+//
+//                    val month = SimpleDateFormat("MMM yyyy", Locale.getDefault()).format(calendar.time)
+//                    val totalAmount = order.total_amount.toFloatOrNull() ?: 0f
+//
+//                    // Tính tổng doanh thu của từng tháng
+//                    revenueByMonth[month] = revenueByMonth.getOrDefault(month, 0f) + totalAmount
+//                }
+//
+//                // Cập nhật biểu đồ
+//                updateChart(revenueByMonth)
+//            } else {
+//                showErrorSnackBar("No orders found.")
+//            }
+//        }
+//    }
+//
+//    private fun updateChart(revenueByMonth: Map<String, Float>) {
+//        if (revenueByMonth.isEmpty()) {
+//            showErrorSnackBar("No revenue data available.")
+//            return
+//        }
+//
+//        // Tạo danh sách BarEntry và Label
+//        val barEntries = ArrayList<BarEntry>()
+//        val labels = ArrayList<String>()
+//
+//        var index = 0
+//        for ((month, revenue) in revenueByMonth.entries.sortedBy { it.key }) {
+//            barEntries.add(BarEntry(index.toFloat(), revenue))
+//            labels.add(month)
+//            index++
+//        }
+//
+//        // Tạo DataSet cho biểu đồ
+//        val barDataSet = BarDataSet(barEntries, "Monthly Revenue")
+//        barDataSet.color = ContextCompat.getColor(requireContext(), R.color.colorPrimary)
+//        barDataSet.valueTextColor = ContextCompat.getColor(requireContext(), R.color.black)
+//        barDataSet.valueTextSize = 12f
+//
+//        // Tạo BarData và thêm vào biểu đồ
+//        val barData = BarData(barDataSet)
+//        barData.barWidth = 0.9f
+//
+//        chartRevenue.data = barData
+//
+//        // Cấu hình trục X
+//        val xAxis = chartRevenue.xAxis
+//        xAxis.valueFormatter = IndexAxisValueFormatter(labels)
+//        xAxis.position = XAxis.XAxisPosition.BOTTOM
+//        xAxis.granularity = 1f
+//        xAxis.labelRotationAngle = -45f
+//
+//        // Cấu hình trục Y
+//        chartRevenue.axisLeft.axisMinimum = 0f
+//        chartRevenue.axisRight.isEnabled = false
+//
+//        // Cấu hình khác
+//        chartRevenue.description.isEnabled = false
+//        chartRevenue.setFitBars(true)
+//        chartRevenue.invalidate() // Làm mới biểu đồ
+//    }
+
+    val barChartData = listOf(
+        BarEntry(1f, 5000f),  // Tháng 1: 5000 doanh thu
+        BarEntry(2f, 8000f),  // Tháng 2: 8000 doanh thu
+        BarEntry(3f, 6500f)   // Tháng 3: 6500 doanh thu
+    )
+
+    val lineChartData = listOf(
+        Entry(1f, 30f),  // Tháng 1: 30 đơn hàng
+        Entry(2f, 50f),  // Tháng 2: 50 đơn hàng
+        Entry(3f, 45f)   // Tháng 3: 45 đơn hàng
+    )
+
+    val pieChartData = listOf(
+        PieEntry(40f, "Electronics"),   // Điện tử chiếm 40%
+        PieEntry(30f, "Fashion"),       // Thời trang chiếm 30%
+        PieEntry(20f, "Groceries"),     // Hàng tiêu dùng chiếm 20%
+        PieEntry(10f, "Others")         // Các loại khác chiếm 10%
+    )
+
+
+    fun getAllOrders(callback: (List<Order>) -> Unit) {
+        val ordersList = ArrayList<Order>()
+
+        // Truy vấn Firestore để lấy tất cả đơn hàng
+        FirebaseFirestore.getInstance()
+            .collection("orders")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    val order = document.toObject(Order::class.java)
+                    ordersList.add(order)
+                }
+                callback(ordersList)
+            }
+            .addOnFailureListener {
+                // Handle failure if necessary
+            }
+    }
+
 
 }
 

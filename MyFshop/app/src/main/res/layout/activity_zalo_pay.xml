@@ -1,0 +1,83 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/colorOffWhite"
+    tools:context=".ui.activities.ZaloPayActivity">
+
+    <!-- Toolbar with back button and title -->
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar_zalo_pay_activity"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:layout_alignParentTop="true"
+        android:background="@drawable/app_gradient_color_background">
+
+        <TextView
+            android:id="@+id/tv_title"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:paddingStart="1dp"
+            android:paddingEnd="0dp"
+            android:text="ZaloPay Payment"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+    </androidx.appcompat.widget.Toolbar>
+
+    <!-- ScrollView for content -->
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/toolbar_zalo_pay_activity"
+        android:fillViewport="true"
+        android:layout_above="@id/ll_zalo_pay_place_order"
+        android:scrollbars="none">
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <!-- Display Total Amount -->
+            <TextView
+                android:id="@+id/tv_zalo_pay_amount"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Amount: $0.0"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:gravity="center"
+                android:padding="8dp" />
+
+            <!-- Confirm Payment Button -->
+            <com.example.myfshop.utils.MSPButton
+                android:id="@+id/btn_confirm_payment"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Confirm Payment"
+                android:layout_below="@id/tv_zalo_pay_amount"
+                android:layout_marginTop="16dp"
+                android:backgroundTint="@color/colorPrimary"
+                android:textColor="@android:color/white"
+                android:padding="12dp"
+                android:textSize="16sp" />
+        </RelativeLayout>
+
+    </ScrollView>
+
+    <!-- Payment Method Section -->
+    <LinearLayout
+        android:id="@+id/ll_zalo_pay_place_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="@color/white"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+
+    </LinearLayout>
+</RelativeLayout>

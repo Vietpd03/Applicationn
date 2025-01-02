@@ -135,6 +135,16 @@
     <string name="title_admin_dashboard">AdminDashboard</string>
     <string name="title_user">User</string>
     <string name="err_msg_product_details">Failed to load product details.</string>
+    <string name="lbl_payment_method">Payment Method</string>
+    <string name="btn_proceed_to_payment">Proceed to Payment</string>
+    <string name="select_payment_method">Select Payment Method</string>
+    <string name="cash_on_delivery">Cash on Delivery (COD)</string>
+    <string name="online_payment">Online Payment</string>
+    <string name="confirm_payment">Confirm Payment</string>
+    <string name="processing_payment">Processing Payment...</string>
+    <string name="btn_lbl_proceed_to_payment">Proceed to Payment</string>
+    <string name="title_charts">Chart</string>
+
 
     <string-array name="product_category_array">
         <item>Pant</item>

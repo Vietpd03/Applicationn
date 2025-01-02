@@ -30,4 +30,5 @@
 
     <color name="colorOrderStatusInProcess">#FF9800</color>
     <color name="colorOrderStatusDelivered">#8BC34A</color>
+    <color name="blue">#2196F3</color>
 </resources>

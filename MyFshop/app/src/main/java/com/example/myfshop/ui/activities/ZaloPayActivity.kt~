@@ -1,0 +1,165 @@
+package com.example.myfshop.ui.activities
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.myfshop.Constant.AppInfo.APP_ID
+import com.example.myfshop.R
+import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaTypeOrNull
+import org.json.JSONObject
+import vn.zalopay.sdk.ZaloPaySDK
+import vn.zalopay.sdk.listeners.PayOrderListener
+import vn.zalopay.sdk.ZaloPayError
+import vn.zalopay.sdk.Environment
+import java.io.IOException
+import javax.crypto.Mac
+import javax.crypto.spec.SecretKeySpec
+
+class ZaloPayActivity : AppCompatActivity() {
+
+    private lateinit var tvZaloPayAmount: TextView
+    private lateinit var btnConfirmPayment: Button
+    private var totalAmount: Double = 0.0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_zalo_pay)
+
+        // Thiết lập Toolbar
+        val toolbar = findViewById<androidx.appcompat.widget.Toolbar>(R.id.toolbar_zalo_pay_activity)
+        setSupportActionBar(toolbar)
+
+        val actionBar = supportActionBar
+        actionBar?.setDisplayHomeAsUpEnabled(true)
+        toolbar.setNavigationOnClickListener { onBackPressed() }
+
+        // ZaloPay SDK Init
+        ZaloPaySDK.init(APP_ID, Environment.SANDBOX) // Thay APP_ID bằng ID của bạn
+
+        // Bind Views
+        tvZaloPayAmount = findViewById(R.id.tv_zalo_pay_amount)
+        btnConfirmPayment = findViewById(R.id.btn_confirm_payment)
+
+        // Lấy số tiền từ Intent
+        totalAmount = intent.getDoubleExtra("totalAmount", 0.0)
+        tvZaloPayAmount.text = "Amount: $%.2f".format(totalAmount)
+
+        // Xử lý khi nhấn nút Thanh Toán
+        btnConfirmPayment.setOnClickListener { createZaloPayOrder() }
+    }
+
+    private fun createZaloPayOrder() {
+        val appID = APP_ID // ID ứng dụng
+        val appUser = "test_user" // Tên người dùng
+        val amount = (totalAmount * 1000).toInt() // Đổi sang VND
+        val appTime = System.currentTimeMillis()
+        val appTransID = generateAppTransID()
+        val embedData = "{}"
+        val items = "[]"
+
+        val key1 = "YOUR_KEY1" // Thay YOUR_KEY1 bằng Key1 của bạn
+        val mac = createMac(appID, appTransID, appUser, amount, appTime, embedData, items, key1)
+
+        val body = mapOf(
+            "app_id" to appID,
+            "app_user" to appUser,
+            "app_time" to appTime,
+            "amount" to amount,
+            "app_trans_id" to appTransID,
+            "embed_data" to embedData,
+            "item" to items,
+            "mac" to mac,
+            "description" to "Thanh toán đơn hàng #$appTransID"
+        )
+
+        val client = OkHttpClient()
+        val requestBody = RequestBody.create(
+            "application/json".toMediaTypeOrNull(),
+            JSONObject(body).toString()
+        )
+
+        val request = Request.Builder()
+            .url("https://sb-openapi.zalopay.vn/v2/create")
+            .post(requestBody)
+            .build()
+
+        client.newCall(request).enqueue(object : Callback {
+            override fun onResponse(call: Call, response: Response) {
+                val responseData = response.body?.string()
+                val jsonResponse = JSONObject(responseData ?: "{}")
+                if (jsonResponse.getInt("return_code") == 1) {
+                    val zpTransToken = jsonResponse.getString("zp_trans_token")
+                    runOnUiThread { initiateZaloPay(zpTransToken) }
+                } else {
+                    val errorMessage = jsonResponse.getString("return_message")
+                    runOnUiThread {
+                        Toast.makeText(applicationContext, "Error: $errorMessage", Toast.LENGTH_SHORT).show()
+                    }
+                }
+            }
+
+            override fun onFailure(call: Call, e: IOException) {
+                runOnUiThread {
+                    Toast.makeText(applicationContext, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        })
+    }
+
+    private fun initiateZaloPay(zpTransToken: String) {
+        ZaloPaySDK.getInstance().payOrder(
+            this,
+            zpTransToken,
+            "yourapp://paymentcallback", // Callback URL
+            object : PayOrderListener {
+                override fun onPaymentSucceeded(transactionId: String, transToken: String, appTransID: String) {
+                    Toast.makeText(applicationContext, "Thanh toán thành công!", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onPaymentCanceled(zpTransToken: String, appTransID: String) {
+                    Toast.makeText(applicationContext, "Thanh toán bị hủy.", Toast.LENGTH_SHORT).show()
+                }
+
+                override fun onPaymentError(zaloPayError: ZaloPayError, zpTransToken: String, appTransID: String) {
+                    Toast.makeText(applicationContext, "Lỗi thanh toán ", Toast.LENGTH_SHORT).show()
+                }
+            }
+        )
+    }
+
+    private fun generateAppTransID(): String {
+        val time = System.currentTimeMillis() / 1000
+        val randomSuffix = (1000..9999).random()
+        return "$time$randomSuffix"
+    }
+
+    private fun createMac(appID: Int, appTransID: String, appUser: String, amount: Int, appTime: Long, embedData: String, items: String, key1: String): String {
+        val data = "$appID|$appTransID|$appUser|$amount|$appTime|$embedData|$items"
+        return hashMac(data, key1)
+    }
+
+    private fun hashMac(data: String, key: String): String {
+        val mac = Mac.getInstance("HmacSHA256")
+        val secretKeySpec = SecretKeySpec(key.toByteArray(Charsets.UTF_8), "HmacSHA256")
+        mac.init(secretKeySpec)
+        val hashBytes = mac.doFinal(data.toByteArray(Charsets.UTF_8))
+        return hashBytes.joinToString("") { "%02x".format(it) }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        val uri = intent.data
+        if (uri != null && uri.scheme == "yourapp") {
+            val returnCode = uri.getQueryParameter("returnCode")
+            if (returnCode == "1") {
+                Toast.makeText(this, "Thanh toán thành công!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Thanh toán thất bại hoặc bị hủy.", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
